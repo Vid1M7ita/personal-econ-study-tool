@@ -1,0 +1,15 @@
+{
+  "name": "econ-study-tool",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Upload lecture slides, get study notes plus checked real-world context (AI Club capstone).",
+  "scripts": {
+    "test": "node --test test/functions.test.mts"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^11.1.7"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^6.0.3"
+  }
+}

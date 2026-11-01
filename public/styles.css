@@ -1,0 +1,272 @@
+/* Fonts are served from this site. The security policy in netlify.toml
+   does not allow loading anything from other domains. */
+@font-face {
+  font-family: "Source Serif 4";
+  src: url("/fonts/source-serif-4.woff2") format("woff2");
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("/fonts/atkinson-next.woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Pale ledger paper, dark green ink, one pen-blue for actions and progress. */
+  --paper: #edf1ee;
+  --panel: #f8faf8;
+  --tint: #dde9e1;
+  --ink: #14231c;
+  --ink-soft: #43554b;
+  --rule: #b4c4b9;
+  --pen: #1c4e80;
+  --on-pen: #ffffff;
+  --red: #a3261d;
+
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --sans: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #101a15;
+    --panel: #17241d;
+    --tint: #1d2e25;
+    --ink: #e6efe9;
+    --ink-soft: #a4b5aa;
+    --rule: #34473c;
+    --pen: #7db2e6;
+    --on-pen: #0b1510;
+    --red: #ff9a90;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 1rem/1.55 var(--sans);
+}
+
+.page {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 4rem;
+}
+
+.masthead {
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--rule);
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+h1 {
+  margin: 2.5rem 0 0.75rem;
+  font: 600 clamp(1.85rem, 5.2vw, 2.6rem) / 1.12 var(--serif);
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+h1:focus { outline: none; }
+
+h2 {
+  margin: 0 0 1rem;
+  font: 600 1.5rem / 1.2 var(--serif);
+}
+
+h3 {
+  margin: 0 0 0.5rem;
+  font: 600 1.2rem / 1.3 var(--serif);
+}
+
+.lede {
+  max-width: 34rem;
+  margin: 0 0 2rem;
+  font: 1.125rem / 1.55 var(--serif);
+  color: var(--ink-soft);
+}
+
+/* ---------- Upload ---------- */
+
+.drop {
+  display: block;
+  position: relative;
+  padding: 1.5rem 1.25rem;
+  border: 2px dashed var(--rule);
+  border-radius: 6px;
+  background: var(--panel);
+  cursor: pointer;
+}
+
+.drop:hover,
+.drop[data-over] { border-color: var(--pen); }
+.drop[data-has-file] { border-style: solid; border-color: var(--pen); }
+.drop:has(input:focus-visible) { outline: 3px solid var(--pen); outline-offset: 2px; }
+
+/* The real input stays in the page for keyboards and screen readers, but is not drawn. */
+.drop input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.drop__main { display: block; font-weight: 700; overflow-wrap: anywhere; }
+.drop__hint { display: block; margin-top: 0.15rem; color: var(--ink-soft); font-size: 0.9rem; }
+
+.btn {
+  margin-top: 1rem;
+  min-height: 2.75rem;
+  padding: 0.6rem 1.4rem;
+  border: 2px solid var(--pen);
+  border-radius: 6px;
+  background: var(--pen);
+  color: var(--on-pen);
+  font: 700 1rem var(--sans);
+  cursor: pointer;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn:focus-visible { outline: 3px solid var(--pen); outline-offset: 3px; }
+.btn:disabled { opacity: 0.6; cursor: progress; }
+.btn--quiet { background: transparent; color: var(--pen); }
+.btn--quiet:hover { background: var(--tint); filter: none; }
+
+.fine { max-width: 34rem; margin: 1rem 0 0; color: var(--ink-soft); font-size: 0.9rem; }
+
+.error {
+  margin: 0.75rem 0 0;
+  padding-left: 0.75rem;
+  border-left: 3px solid var(--red);
+  color: var(--red);
+  font-weight: 700;
+}
+
+/* ---------- Progress trace ----------
+   Solid line = reached. Dashed line = still to come, like a forecast on a chart. */
+
+.job__file { margin: 0 0 1.75rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+
+.trace {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0 0 0.75rem;
+  padding: 0;
+  list-style: none;
+  font-size: 0.95rem;
+}
+
+.trace li { position: relative; padding-top: 1.6rem; padding-right: 0.5rem; color: var(--ink-soft); }
+.trace li[data-state="done"],
+.trace li[data-state="active"] { color: var(--ink); font-weight: 700; }
+.trace li[data-state="failed"] { color: var(--red); font-weight: 700; }
+
+.trace li::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 2px solid var(--rule);
+  border-radius: 50%;
+  background: var(--paper);
+}
+.trace li[data-state="done"]::before { border-color: var(--pen); background: var(--pen); }
+.trace li[data-state="active"]::before { border-color: var(--pen); background: var(--paper); animation: waiting 1.8s ease-out infinite; }
+.trace li[data-state="failed"]::before { border-color: var(--red); background: var(--red); }
+
+.trace li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 0.4rem;
+  left: 1.1rem;
+  right: 0.2rem;
+  border-top: 2px dashed var(--rule);
+}
+.trace li[data-state="done"]:not(:last-child)::after { border-top-style: solid; border-top-color: var(--pen); }
+
+@keyframes waiting {
+  from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--pen) 45%, transparent); }
+  to   { box-shadow: 0 0 0 0.6rem transparent; }
+}
+
+.status { min-height: 1.5em; margin: 0 0 2rem; color: var(--ink-soft); }
+
+/* ---------- Results ---------- */
+
+.notes,
+.context { margin-top: 2.25rem; }
+
+.topic { margin-bottom: 2rem; font: 1.125rem / 1.65 var(--serif); }
+.topic ul { margin: 0 0 1rem; padding-left: 1.25rem; }
+.topic li { margin-bottom: 0.4rem; padding-left: 0.2rem; }
+
+.analogy {
+  margin: 0;
+  padding-left: 1rem;
+  border-left: 3px solid var(--pen);
+}
+
+/* Outside sources sit on a tinted panel so they never look like part of the slides. */
+.context {
+  padding: 1.25rem 1.25rem 0.5rem;
+  border-radius: 4px;
+  background: var(--tint);
+}
+.context__note { margin: 0 0 1.25rem; color: var(--ink-soft); font-size: 0.95rem; }
+.context h3 { margin-top: 1.5rem; }
+
+.items { margin: 0 0 1.5rem; padding: 0; list-style: none; }
+.items > li { padding: 1rem 0; border-top: 1px solid var(--rule); }
+.items > li:last-child { padding-bottom: 0.5rem; }
+
+.item__title { margin: 0; font: 600 1.1rem / 1.35 var(--serif); }
+.item__title a { color: var(--pen); text-underline-offset: 0.15em; overflow-wrap: anywhere; }
+.item__title a:focus-visible { outline: 3px solid var(--pen); outline-offset: 2px; }
+.item__meta { margin: 0.15rem 0 0.4rem; color: var(--ink-soft); font-size: 0.9rem; }
+.item__body { margin: 0.3rem 0 0; font: 1rem / 1.6 var(--serif); }
+.item__flag { color: var(--red); font-weight: 700; }
+
+.table-wrap { overflow-x: auto; margin-bottom: 1.5rem; }
+table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+caption { padding-bottom: 0.5rem; text-align: left; }
+th, td { padding: 0.5rem 0.6rem 0.5rem 0; border-top: 1px solid var(--rule); text-align: left; vertical-align: top; }
+thead th { border-top: 0; border-bottom: 2px solid var(--ink-soft); }
+tbody tr.takeaway td { padding-top: 0; border-top: 0; color: var(--ink-soft); font-family: var(--serif); }
+
+.raw {
+  margin: 0 0 1rem;
+  padding: 0.75rem;
+  overflow-x: auto;
+  background: var(--panel);
+  font-size: 0.85rem;
+}
+
+/* ---------- Footer ---------- */
+
+.trust {
+  max-width: 34rem;
+  margin-top: 3.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+.trust p { margin: 0; }
+
+[hidden] { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .trace li[data-state="active"]::before { animation: none; box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--pen) 30%, transparent); }
+}

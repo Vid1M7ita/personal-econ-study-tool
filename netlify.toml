@@ -1,0 +1,16 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+# Security headers for the static page. (These do not apply to function
+# responses; the functions set their own headers in code.)
+# The page loads no outside scripts, styles, fonts or images, so the
+# policy can stay strict. Model output is untrusted, and this limits the
+# damage if a bug ever lets some of it be treated as markup.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "no-referrer"

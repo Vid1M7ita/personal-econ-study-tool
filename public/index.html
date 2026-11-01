@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Econ Study Tool</title>
+  <meta name="description" content="Upload an economics lecture PDF. Get study notes first, then real-world examples with source links.">
+  <link rel="icon" href="data:,">
+  <link rel="preload" href="/fonts/source-serif-4.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="page">
+    <header class="masthead">Econ Study Tool</header>
+
+    <main>
+      <section id="intro" aria-labelledby="title">
+        <h1 id="title">Upload an economics lecture. Get notes, then the news behind them.</h1>
+        <p class="lede">Notes for up to three topics come first. Real-world examples, each with a source link, follow.</p>
+
+        <form id="upload-form" novalidate>
+          <label class="drop" id="drop" for="file">
+            <input type="file" id="file" name="file" accept="application/pdf,.pdf">
+            <span class="drop__main" id="drop-text">Choose a PDF or drop it here</span>
+            <span class="drop__hint">PDF, up to 4 MB</span>
+          </label>
+          <p class="error" id="form-error" role="alert" hidden></p>
+          <button class="btn" id="submit" type="submit">Make notes</button>
+          <p class="fine">Your slides are sent to Google's Gemini to write the notes. Upload only slides you are fine sharing. Notes are deleted after 24 hours.</p>
+        </form>
+      </section>
+
+      <section id="job" aria-labelledby="job-title" hidden>
+        <h1 id="job-title" tabindex="-1">Your notes</h1>
+        <p class="job__file" id="job-file"></p>
+
+        <ol class="trace" id="trace" aria-label="Progress">
+          <li data-step="received" data-state="todo">Slides received</li>
+          <li data-step="notes" data-state="todo">Notes</li>
+          <li data-step="context" data-state="todo">Real-world context</li>
+        </ol>
+        <p class="status" id="status-text" role="status" aria-live="polite"></p>
+
+        <div id="notes-out"></div>
+        <div id="context-out"></div>
+
+        <button class="btn btn--quiet" id="restart" type="button" hidden>Upload another PDF</button>
+      </section>
+    </main>
+
+    <footer class="trust">
+      <p>The notes are written from your slides. Outside examples come from web search or public data, and each links to its source. An AI writes the summaries, so it can misread a source. Check the link before you cite it.</p>
+    </footer>
+  </div>
+</body>
+</html>
