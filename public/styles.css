@@ -15,34 +15,57 @@
   font-display: swap;
 }
 
+/* ---------- Themes ----------
+   Dark is the default: slate, teal, lavender and plum.
+   Light: mint, butter, teal and aqua on a pale lime paper.
+   Text colors are chosen so body text stays at 4.5:1 contrast or better on every surface. */
+
 :root {
-  /* Pale ledger paper, dark green ink, one pen-blue for actions and progress. */
-  --paper: #edf1ee;
-  --panel: #f8faf8;
-  --tint: #dde9e1;
-  --ink: #14231c;
-  --ink-soft: #43554b;
-  --rule: #b4c4b9;
-  --pen: #1c4e80;
-  --on-pen: #ffffff;
-  --red: #a3261d;
+  color-scheme: dark;
+  --paper: #2e4045;
+  --bar: #243338;        /* header and footer bands */
+  --panel: #263539;      /* upload card */
+  --tint: #5e3c58;       /* outside sources sit on plum */
+  --note: #3a5157;       /* analogy callout */
+  --ink: #f3eef4;
+  --ink-soft: #c7bbc9;
+  --rule: #587177;
+  --rule-tint: #85607f;  /* lines drawn on the plum panel */
+  --accent: #83adb5;     /* buttons and filled marks */
+  --on-accent: #1b2a2e;
+  --link: #a9d0d7;
+  --line: #83adb5;       /* progress line and selected borders */
+  --red: #ffb3a7;
+  --m1: #83adb5;
+  --m2: #c7bbc9;
+  --m3: #bfb5b2;
 
   --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
   --sans: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --gutter: clamp(1rem, 3vw, 2.5rem);
+  /* Header, content and footer share this left and right edge, so they line up on any screen. */
+  --edge: max(var(--gutter), calc((100% - 112rem) / 2 + var(--gutter)));
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #101a15;
-    --panel: #17241d;
-    --tint: #1d2e25;
-    --ink: #e6efe9;
-    --ink-soft: #a4b5aa;
-    --rule: #34473c;
-    --pen: #7db2e6;
-    --on-pen: #0b1510;
-    --red: #ff9a90;
-  }
+:root[data-theme="light"] {
+  color-scheme: light;
+  --paper: #f2f6c3;
+  --bar: #96ead7;
+  --panel: #fafce0;
+  --tint: #b8dbd3;
+  --note: #f7e7b4;
+  --ink: #16302a;
+  --ink-soft: #3d5a52;
+  --rule: #9fbfb4;
+  --rule-tint: #84b3a8;
+  --accent: #68c4af;
+  --on-accent: #0f2a24;
+  --link: #0a5546;
+  --line: #2a8f79;
+  --red: #a3261d;
+  --m1: #68c4af;
+  --m2: #96ead7;
+  --m3: #f7e7b4;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -50,67 +73,124 @@
 html { -webkit-text-size-adjust: 100%; }
 
 body {
+  min-height: 100vh;
   margin: 0;
+  display: flex;
+  flex-direction: column;
   background: var(--paper);
   color: var(--ink);
   font: 1rem/1.55 var(--sans);
 }
 
-.page {
-  max-width: 44rem;
-  margin: 0 auto;
-  padding: 1.25rem 1rem 4rem;
+/* ---------- Header ---------- */
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem var(--edge);
+  background: var(--bar);
+  border-bottom: 1px solid var(--rule);
 }
 
-.masthead {
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--rule);
-  font-weight: 700;
-  color: var(--ink-soft);
+.brand { display: flex; align-items: center; gap: 0.9rem; min-width: 0; }
+.brand__mark { flex: none; height: 3.4rem; width: auto; aspect-ratio: 62 / 50; }
+.brand__name {
+  font: 700 clamp(1.4rem, 2.8vw, 2.25rem) / 1.05 var(--serif);
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
+}
+
+/* The logo is three rising bars, like a bar chart, labelled S, B and E. */
+.mark-bar { stroke: var(--ink); stroke-width: 1.5; }
+.m1 { fill: var(--m1); }
+.m2 { fill: var(--m2); }
+.m3 { fill: var(--m3); }
+.mark-glyph { fill: var(--on-accent); }
+
+.theme {
+  flex: none;
+  min-height: 2.5rem;
+  padding: 0.35rem 1rem;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font: 700 0.95rem var(--sans);
+  cursor: pointer;
+}
+.theme:hover { background: var(--paper); }
+.theme:focus-visible { outline: 3px solid var(--link); outline-offset: 3px; }
+
+/* ---------- Page frame ---------- */
+
+.stage {
+  flex: 1;
+  width: 100%;
+  padding: clamp(1.25rem, 3vw, 2.5rem) var(--edge) 2.5rem;
 }
 
 h1 {
-  margin: 2.5rem 0 0.75rem;
-  font: 600 clamp(1.85rem, 5.2vw, 2.6rem) / 1.12 var(--serif);
+  margin: 0 0 0.75rem;
+  font: 600 clamp(1.7rem, 3vw, 2.2rem) / 1.12 var(--serif);
   letter-spacing: -0.015em;
   text-wrap: balance;
 }
-
 h1:focus { outline: none; }
 
-h2 {
-  margin: 0 0 1rem;
-  font: 600 1.5rem / 1.2 var(--serif);
+h2 { margin: 0 0 1rem; font: 600 1.5rem / 1.2 var(--serif); }
+h3 { margin: 0 0 0.5rem; font: 600 1.2rem / 1.3 var(--serif); }
+
+/* ---------- Start screen ---------- */
+
+.hero { display: grid; gap: 2.5rem 4.5rem; align-items: center; }
+
+.hero h1 {
+  margin-bottom: 1rem;
+  font-size: clamp(2.1rem, 4.4vw, 3.7rem);
+  line-height: 1.08;
 }
 
-h3 {
-  margin: 0 0 0.5rem;
-  font: 600 1.2rem / 1.3 var(--serif);
+.lede { max-width: 36rem; margin: 0 0 1.5rem; font: 1.2rem / 1.55 var(--serif); color: var(--ink-soft); }
+
+.gets { max-width: 36rem; margin: 0; padding: 0; list-style: none; }
+.gets li { padding: 0.65rem 0; border-top: 1px solid var(--rule); }
+.gets li:last-child { border-bottom: 1px solid var(--rule); }
+
+.upload { padding: clamp(1.25rem, 2.5vw, 2rem); border: 1px solid var(--rule); border-radius: 8px; background: var(--panel); }
+
+/* Phones: heading, short intro, then the upload box, then the longer list.
+   The upload box should be reachable without scrolling past the list. */
+@media (max-width: 61.99rem) {
+  .hero { gap: 0; }
+  .hero__text { display: contents; }
+  .hero h1 { order: 1; }
+  .lede { order: 2; }
+  .upload { order: 3; margin-bottom: 1.75rem; }
+  .gets { order: 4; }
 }
 
-.lede {
-  max-width: 34rem;
-  margin: 0 0 2rem;
-  font: 1.125rem / 1.55 var(--serif);
-  color: var(--ink-soft);
+@media (min-width: 62rem) {
+  .hero { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); min-height: calc(100vh - 13rem); }
 }
-
-/* ---------- Upload ---------- */
 
 .drop {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   position: relative;
+  min-height: 11rem;
   padding: 1.5rem 1.25rem;
-  border: 2px dashed var(--rule);
+  border: 2px dashed var(--line);
   border-radius: 6px;
-  background: var(--panel);
+  background: var(--paper);
   cursor: pointer;
 }
-
 .drop:hover,
-.drop[data-over] { border-color: var(--pen); }
-.drop[data-has-file] { border-style: solid; border-color: var(--pen); }
-.drop:has(input:focus-visible) { outline: 3px solid var(--pen); outline-offset: 2px; }
+.drop[data-over] { border-color: var(--link); background: var(--bar); }
+.drop[data-has-file] { border-style: solid; border-color: var(--link); }
+.drop:has(input:focus-visible) { outline: 3px solid var(--link); outline-offset: 2px; }
 
 /* The real input stays in the page for keyboards and screen readers, but is not drawn. */
 .drop input {
@@ -122,27 +202,27 @@ h3 {
   cursor: pointer;
 }
 
-.drop__main { display: block; font-weight: 700; overflow-wrap: anywhere; }
-.drop__hint { display: block; margin-top: 0.15rem; color: var(--ink-soft); font-size: 0.9rem; }
+.drop__main { display: block; font-size: 1.15rem; font-weight: 700; overflow-wrap: anywhere; }
+.drop__hint { display: block; margin-top: 0.2rem; color: var(--ink-soft); font-size: 0.95rem; }
 
 .btn {
   margin-top: 1rem;
   min-height: 2.75rem;
-  padding: 0.6rem 1.4rem;
-  border: 2px solid var(--pen);
+  padding: 0.6rem 1.5rem;
+  border: 2px solid var(--accent);
   border-radius: 6px;
-  background: var(--pen);
-  color: var(--on-pen);
+  background: var(--accent);
+  color: var(--on-accent);
   font: 700 1rem var(--sans);
   cursor: pointer;
 }
 .btn:hover { filter: brightness(1.08); }
-.btn:focus-visible { outline: 3px solid var(--pen); outline-offset: 3px; }
+.btn:focus-visible { outline: 3px solid var(--link); outline-offset: 3px; }
 .btn:disabled { opacity: 0.6; cursor: progress; }
-.btn--quiet { background: transparent; color: var(--pen); }
-.btn--quiet:hover { background: var(--tint); filter: none; }
+.btn--quiet { margin-top: 0; background: transparent; border-color: var(--line); color: var(--link); }
+.btn--quiet:hover { background: var(--bar); filter: none; }
 
-.fine { max-width: 34rem; margin: 1rem 0 0; color: var(--ink-soft); font-size: 0.9rem; }
+.fine { margin: 1rem 0 0; color: var(--ink-soft); font-size: 0.9rem; }
 
 .error {
   margin: 0.75rem 0 0;
@@ -152,10 +232,38 @@ h3 {
   font-weight: 700;
 }
 
+/* ---------- Results workspace ----------
+   Narrow: one column. Wide: progress strip on top, notes and context side by side.
+   Very wide: progress moves to a left rail, so nothing sits above the content. */
+
+.workspace { display: grid; gap: 1.75rem 2.5rem; align-items: start; }
+
+.rail { display: grid; gap: 1rem 2rem; grid-column: 1 / -1; padding-bottom: 1.25rem; border-bottom: 1px solid var(--rule); }
+.rail__head h1 { margin: 0 0 0.25rem; }
+.job__file { margin: 0; color: var(--ink-soft); overflow-wrap: anywhere; }
+.rail__action { align-self: center; }
+
+@media (min-width: 64rem) {
+  .workspace { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .rail { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto; align-items: center; }
+}
+
+@media (min-width: 90rem) {
+  .workspace { grid-template-columns: 17rem minmax(0, 1fr) minmax(0, 1fr); }
+  .rail {
+    grid-column: auto;
+    display: block;
+    position: sticky;
+    top: 1.25rem;
+    padding: 0 1.5rem 0 0;
+    border-bottom: 0;
+  }
+  .rail__head { margin-bottom: 1.75rem; }
+  .rail__action { margin-top: 0.5rem; }
+}
+
 /* ---------- Progress trace ----------
    Solid line = reached. Dashed line = still to come, like a forecast on a chart. */
-
-.job__file { margin: 0 0 1.75rem; color: var(--ink-soft); overflow-wrap: anywhere; }
 
 .trace {
   display: grid;
@@ -182,8 +290,8 @@ h3 {
   border-radius: 50%;
   background: var(--paper);
 }
-.trace li[data-state="done"]::before { border-color: var(--pen); background: var(--pen); }
-.trace li[data-state="active"]::before { border-color: var(--pen); background: var(--paper); animation: waiting 1.8s ease-out infinite; }
+.trace li[data-state="done"]::before { border-color: var(--line); background: var(--line); }
+.trace li[data-state="active"]::before { border-color: var(--line); background: var(--paper); animation: waiting 1.8s ease-out infinite; }
 .trace li[data-state="failed"]::before { border-color: var(--red); background: var(--red); }
 
 .trace li:not(:last-child)::after {
@@ -194,46 +302,66 @@ h3 {
   right: 0.2rem;
   border-top: 2px dashed var(--rule);
 }
-.trace li[data-state="done"]:not(:last-child)::after { border-top-style: solid; border-top-color: var(--pen); }
+.trace li[data-state="done"]:not(:last-child)::after { border-top-style: solid; border-top-color: var(--line); }
+
+@media (min-width: 90rem) {
+  .trace { grid-template-columns: 1fr; }
+  .trace li { padding: 0 0 1.6rem 2rem; }
+  .trace li::before { top: 0.15rem; }
+  .trace li:not(:last-child)::after {
+    top: 1.2rem;
+    bottom: 0.1rem;
+    left: 0.45rem;
+    right: auto;
+    border-top: 0;
+    border-left: 2px dashed var(--rule);
+  }
+  .trace li[data-state="done"]:not(:last-child)::after { border-left-style: solid; border-left-color: var(--line); }
+}
 
 @keyframes waiting {
-  from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--pen) 45%, transparent); }
+  from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--line) 45%, transparent); }
   to   { box-shadow: 0 0 0 0.6rem transparent; }
 }
 
-.status { min-height: 1.5em; margin: 0 0 2rem; color: var(--ink-soft); }
+.status { min-height: 1.5em; margin: 0; color: var(--ink-soft); }
 
-/* ---------- Results ---------- */
+/* ---------- Notes and context ---------- */
 
-.notes,
-.context { margin-top: 2.25rem; }
+/* Shown until the real content arrives, so the layout does not jump. */
+.pane:empty::before { content: attr(data-empty); color: var(--ink-soft); font: 1.05rem var(--serif); }
 
-.topic { margin-bottom: 2rem; font: 1.125rem / 1.65 var(--serif); }
-.topic ul { margin: 0 0 1rem; padding-left: 1.25rem; }
-.topic li { margin-bottom: 0.4rem; padding-left: 0.2rem; }
+.notes, .context { margin: 0; }
+
+.topic { margin-bottom: 1.75rem; font: 1.0625rem / 1.62 var(--serif); }
+.topic ul { margin: 0 0 0.9rem; padding-left: 1.25rem; }
+.topic li { margin-bottom: 0.35rem; padding-left: 0.2rem; }
 
 .analogy {
   margin: 0;
-  padding-left: 1rem;
-  border-left: 3px solid var(--pen);
+  padding: 0.6rem 1rem;
+  border-left: 3px solid var(--line);
+  background: var(--note);
 }
 
-/* Outside sources sit on a tinted panel so they never look like part of the slides. */
+/* Outside sources sit on their own colored panel so they never look like part of the slides. */
 .context {
-  padding: 1.25rem 1.25rem 0.5rem;
-  border-radius: 4px;
+  padding: 1.25rem 1.5rem 0.5rem;
+  border-radius: 6px;
   background: var(--tint);
 }
 .context__note { margin: 0 0 1.25rem; color: var(--ink-soft); font-size: 0.95rem; }
 .context h3 { margin-top: 1.5rem; }
 
 .items { margin: 0 0 1.5rem; padding: 0; list-style: none; }
-.items > li { padding: 1rem 0; border-top: 1px solid var(--rule); }
+.items > li { padding: 0.9rem 0; border-top: 1px solid var(--rule-tint); }
 .items > li:last-child { padding-bottom: 0.5rem; }
 
 .item__title { margin: 0; font: 600 1.1rem / 1.35 var(--serif); }
-.item__title a { color: var(--pen); text-underline-offset: 0.15em; overflow-wrap: anywhere; }
-.item__title a:focus-visible { outline: 3px solid var(--pen); outline-offset: 2px; }
+.item__title a,
+th a { color: var(--link); text-underline-offset: 0.15em; overflow-wrap: anywhere; }
+.item__title a:focus-visible,
+th a:focus-visible { outline: 3px solid var(--link); outline-offset: 2px; }
 .item__meta { margin: 0.15rem 0 0.4rem; color: var(--ink-soft); font-size: 0.9rem; }
 .item__body { margin: 0.3rem 0 0; font: 1rem / 1.6 var(--serif); }
 .item__flag { color: var(--red); font-weight: 700; }
@@ -241,10 +369,8 @@ h3 {
 .table-wrap { overflow-x: auto; margin-bottom: 1.5rem; }
 table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
 caption { padding-bottom: 0.5rem; text-align: left; }
-th, td { padding: 0.5rem 0.6rem 0.5rem 0; border-top: 1px solid var(--rule); text-align: left; vertical-align: top; }
+th, td { padding: 0.5rem 0.6rem 0.5rem 0; border-top: 1px solid var(--rule-tint); text-align: left; vertical-align: top; }
 thead th { border-top: 0; border-bottom: 2px solid var(--ink-soft); }
-th a { color: var(--pen); text-underline-offset: 0.15em; }
-th a:focus-visible { outline: 3px solid var(--pen); outline-offset: 2px; }
 .cell__sub { display: block; margin-top: 0.1rem; color: var(--ink-soft); font-size: 0.85rem; font-weight: 400; }
 tbody tr.takeaway td { padding-top: 0; border-top: 0; color: var(--ink-soft); font-family: var(--serif); }
 
@@ -259,17 +385,21 @@ tbody tr.takeaway td { padding-top: 0; border-top: 0; color: var(--ink-soft); fo
 /* ---------- Footer ---------- */
 
 .trust {
-  max-width: 34rem;
-  margin-top: 3.5rem;
-  padding-top: 1rem;
+  padding: 1rem var(--edge);
+  background: var(--bar);
   border-top: 1px solid var(--rule);
   color: var(--ink-soft);
   font-size: 0.9rem;
 }
-.trust p { margin: 0; }
+.trust p { max-width: 62rem; margin: 0; }
 
 [hidden] { display: none !important; }
 
+@media (max-width: 30rem) {
+  .brand__mark { height: 2.6rem; }
+  .theme { padding-inline: 0.8rem; font-size: 0.85rem; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .trace li[data-state="active"]::before { animation: none; box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--pen) 30%, transparent); }
+  .trace li[data-state="active"]::before { animation: none; box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--line) 30%, transparent); }
 }

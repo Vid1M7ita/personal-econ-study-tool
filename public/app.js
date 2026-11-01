@@ -33,6 +33,25 @@ const restartBtn = $("restart");
 
 let activeJob = null; // { id, timer, notesShown, contextShown }
 
+/* ---------- theme ---------- */
+
+const themeBtn = $("theme");
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  themeBtn.textContent = theme === "dark" ? "Light mode" : "Dark mode";
+}
+
+applyTheme(document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark");
+
+themeBtn.addEventListener("click", () => {
+  const next = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+  applyTheme(next);
+  try {
+    localStorage.setItem("sbe-theme", next); // a convenience only; the page works without it
+  } catch {}
+});
+
 /* ---------- small helpers ---------- */
 
 /** Build an element. String children become text nodes, so they can never turn into markup. */
@@ -339,7 +358,7 @@ function renderArticles(list) {
 
 /** Built here, not by the AI, so the link can never be made up. Only plain indicator codes are accepted. */
 function worldBankUrl(code) {
-  return /^[A-Z0-9.]{3,40}$/.test(String(code ?? "")) ? `https://data.worldbank.org/indicator/${code}?locations=US-IN` : null;
+  return /^[A-Z0-9.]{3,40}$/.test(String(code ?? "")) ? `https://data.worldbank.org/indicator/${code}` : null;
 }
 
 /** The two countries often report different years, so every value carries its own. */
@@ -379,7 +398,7 @@ function renderComparison(list) {
   const table = el(
     "table",
     {},
-    el("caption", { class: "item__meta" }, "Figures are from the World Bank. Each value shows its own year. Open a measure to see the source."),
+    el("caption", { class: "item__meta" }, "Figures are from the World Bank. Each value shows its own year. Open a measure to see the source. If its chart does not show these two countries, add them in its search box."),
     el("thead", {}, el("tr", {}, el("th", { scope: "col" }, "Measure"), el("th", { scope: "col" }, "United States"), el("th", { scope: "col" }, "India"))),
     body,
   );
