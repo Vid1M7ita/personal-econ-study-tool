@@ -1,0 +1,600 @@
+{
+  "name": "SBE study tool workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "2816a7c8-5948-44d7-9020-699f98a7cbde",
+        "authentication": "headerAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        -416,
+        -192
+      ],
+      "id": "329ab11e-0dd1-424b-a8ab-e78531d48292",
+      "name": "Webhook",
+      "webhookId": "2816a7c8-5948-44d7-9020-699f98a7cbde",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Da3oyRYVEDCNwQcW",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "document",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3.5-flash-lite",
+          "mode": "list",
+          "cachedResultName": "Gemini 3.5 Flash Lite"
+        },
+        "text": "You are writing study notes for a university economics student from the attached lecture slides (a PDF).\n\nPick the 3 most important topics in the lecture. Use fewer if the lecture only covers 1 or 2.\n\nWrite each topic in exactly this format:\n\nTOPIC: a short topic name, 2 to 6 words\n- one bullet point, one sentence\n- one bullet point, one sentence\nANALOGY: one or two sentences using an everyday comparison\n\nRules:\n- Each topic has 4 to 6 bullet points. Each bullet starts with \"- \" and is one sentence. Cover the key ideas, definitions, and how the ideas connect. Use only what is in the slides.\n- Include the ANALOGY line only if the topic is hard for a first-time student, for example abstract, multi-step, or easy to confuse with another idea. For other topics, leave the ANALOGY line out.\n- Plain text only. No markdown, no asterisks, no numbering, no headings.\n- Put a blank line between topics.\n- Write nothing before the first TOPIC line and nothing after the last topic.",
+        "inputType": "binary",
+        "binaryPropertyName": "file",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -160,
+        -192
+      ],
+      "id": "025bf667-4a86-4386-a3ac-42287798c959",
+      "name": "Analyze document1",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "maxTries": 4,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "ahZumYPOKpmNDi3t",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -80,
+        224
+      ],
+      "id": "866a8429-8ff2-4490-a365-09ce5482fe05",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "ahZumYPOKpmNDi3t",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', `A short, plain search query of 3 to 7 words about real-world news related to the lecture topic, for example: unemployment insurance benefits extension labor market. Do not include dates, years, or website names.`, 'string') }}",
+        "topic": "news",
+        "timeRange": "any",
+        "searchDepth": "basic",
+        "includeAnswer": "none",
+        "includeDomains": "",
+        "excludeDomains": "",
+        "options": {
+          "max_results": 3,
+          "start_date": "2021-01-01",
+          "topic": "general"
+        }
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 2.1,
+      "position": [
+        96,
+        240
+      ],
+      "id": "49b85795-6caa-4b9d-a443-5bb84bf4974e",
+      "name": "Search the web in Tavily",
+      "credentials": {
+        "tavilyApi": {
+          "id": "drfY7K3oeo8YsrCa",
+          "name": "Tavily account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://studybetterecon.netlify.app/api/save-results",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "jobId",
+              "value": "={{ $('Webhook').item.json.body.jobId }}"
+            },
+            {
+              "name": "stage",
+              "value": "context"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.contextJson }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1424,
+        -128
+      ],
+      "id": "fa1e4785-7511-4782-baf7-8ccbd1651b4b",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "nxd3QVL32GOCUpqo",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://studybetterecon.netlify.app/api/save-results",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "jobId",
+              "value": "={{ $('Webhook').item.json.body.jobId }}"
+            },
+            {
+              "name": "stage",
+              "value": "notes"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.notesJson }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        368,
+        -256
+      ],
+      "id": "a0c7785f-b246-4a0e-931f-8f3a66fda90e",
+      "name": "Send notes",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "nxd3QVL32GOCUpqo",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        416,
+        240
+      ],
+      "id": "d5b9ee3b-ebe8-4578-aecd-3813c02ae782",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "ahZumYPOKpmNDi3t",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Looks up the most recent World Bank value for one indicator, for both the United States and India. Input is one indicator code from the allowed list.",
+        "url": "=  https://api.worldbank.org/v2/country/USA;IND/indicator/{{ $fromAI('indicator', 'One World Bank indicator code from the allowed list, for example SL.UEM.TOTL.ZS', 'string') }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "format",
+              "value": "json"
+            },
+            {
+              "name": "mrnev",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.5,
+      "position": [
+        720,
+        256
+      ],
+      "id": "03b33070-3fea-42c0-bfcc-253a25f46443",
+      "name": "World Bank Data"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        912,
+        256
+      ],
+      "id": "272b6789-0bde-45a4-be26-9b38409f6a72",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "ahZumYPOKpmNDi3t",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', `A short, plain search query of 3 to 7 words naming a historical economic episode and the idea it shows, for example: Volcker disinflation unemployment. Do not include website names.`, 'string') }}",
+        "topic": "news",
+        "timeRange": "any",
+        "searchDepth": "basic",
+        "includeAnswer": "none",
+        "includeDomains": "",
+        "excludeDomains": "",
+        "options": {
+          "max_results": 3,
+          "start_date": "",
+          "topic": "general"
+        }
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 2.1,
+      "position": [
+        1120,
+        240
+      ],
+      "id": "28c43f59-c016-4097-8cd9-6e8bd6bb89e8",
+      "name": "Search the web in Tavily1",
+      "credentials": {
+        "tavilyApi": {
+          "id": "drfY7K3oeo8YsrCa",
+          "name": "Tavily account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Turn each agent's answer into data. If an answer is missing or unreadable, say so in the note.\nconst problems = [];\n\nfunction read(nodeName, label) {\n  let raw;\n  try {\n    raw = $(nodeName).first().json.output;\n  } catch (e) {\n    problems.push(`${label} could not be read (no node named \"${nodeName}\").`);\n    return {};\n  }\n  if (raw && typeof raw === 'object') return raw; // already structured data\n  try {\n    const text = String(raw).trim().replace(/^```(?:json)?\\s*/i, '').replace(/\\s*```$/, '');\n    return JSON.parse(text);\n  } catch (e) {\n    problems.push(`${label} returned an answer that could not be read.`);\n    return {};\n  }\n}\n\nconst news = read('Related News agent', 'The news search');\nconst compare = read('US vs India agent', 'The US vs India comparison');\nconst history = read('Modern history agent', 'The history comparison');\n\nconst context = {\n  articles: news.articles || [],\n  comparison: compare.comparison || [],\n  history: history.history || [],\n};\nconst notes = [news.note, compare.note, history.note, ...problems].filter(Boolean);\nif (notes.length) context.note = notes.join(' ');\n\nreturn { json: { contextJson: JSON.stringify(context) } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1216,
+        -128
+      ],
+      "id": "f64904af-b64b-4387-90df-61111694a60b",
+      "name": "Combine Context"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Lecture topics:\n{{ $('Get Topics').first().json.topicList }}\n\nFor each topic above, use the Tavily search tool to find one news article published since 2021 that shows the topic in a real-world event.\n\nRules:\n- If the topic list is empty, return exactly: {\"articles\": [], \"note\": \"No topics found\"}\n- Search once per topic, at most 3 searches in total. Then stop and answer, even if some topics had no good article.\n- Write short, plain search queries (3 to 7 words) about real events, such as \"unemployment insurance benefits extension labor market\". Do not paste the topic title as the query.\n- Use news reporting, not opinion pieces. Skip results that are not about the topic, such as financial filings.\n- Only use articles that appear in the search results. Copy each URL exactly as returned. Never write a URL from memory.\n- If a topic has no good match, leave it out. Do not invent titles, dates, or URLs.\n- Copy the topic title exactly as written in the list above.\n- If no topic has a match, return exactly: {\"articles\": [], \"note\": \"No article found\"}\n\nReturn only JSON in this shape, with no other text:\n{\"articles\": [{\"topic\": \"<topic title from the list>\", \"title\": \"...\", \"url\": \"...\", \"published\": \"<the published_date from the search result, or unknown>\", \"why_it_fits\": \"<one sentence>\"}]}",
+        "options": {
+          "maxIterations": 6
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        112,
+        48
+      ],
+      "id": "8f1eafe3-c2d4-4a04-ba97-9f8086ac21eb",
+      "name": "Related News agent",
+      "executeOnce": false,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Lecture topics:\n{{ $('Get Topics').first().json.topicList }}\n\nCompare the United States and India for these topics using World Bank data.\n\nAllowed indicators (use only these codes):\nSL.UEM.TOTL.ZS = Unemployment rate (% of labor force)\nSL.UEM.1524.ZS = Youth unemployment rate (% of labor force ages 15 to 24)\nSL.TLF.CACT.ZS = Labor force participation rate (% of population ages 15 and over)\nSL.EMP.VULN.SI.ZS = Vulnerable employment (% of total employment)\nFP.CPI.TOTL.ZG = Inflation, consumer prices (annual %)\nNY.GDP.MKTP.KD.ZG = GDP growth (annual %)\nNY.GDP.PCAP.PP.CD = GDP per capita, PPP (current international $)\nNY.GNS.ICTR.ZS = Gross savings (% of GDP)\nNE.GDI.TOTL.ZS = Investment, gross capital formation (% of GDP)\nNE.EXP.GNFS.ZS = Exports of goods and services (% of GDP)\n\nSteps:\n1. Decide which 2 or 3 indicators best fit the topics above. Pick the most relevant ones, not all of them.\n2. Call the World Bank tool once per chosen indicator. Use at most 3 calls in total.\n3. Write the result.\n\nRules:\n- Use only the indicator codes in the allowed list.\n- If the topic list above is empty, return exactly: {\"comparison\": []}\n- Copy each value and year exactly from the tool result. Round percentages to 1 decimal place. Round dollar amounts over 1,000 to a whole number. The two countries can have different years. Report each country's own year.\n- If the tool returns no value for a country, leave that indicator out.\n- Do not use numbers from your own memory.\n- takeaway: one plain sentence comparing the two countries. Say only what the numbers show. Do not explain causes the data does not show.\n- topic: copy the closest topic title from the list above.\n- If nothing works, return exactly: {\"comparison\": []}\n\nReturn only JSON in this shape, with no other text:\n{\"comparison\": [{\"topic\": \"<topic title>\", \"code\": \"<indicator code>\", \"indicator\": \"<label from the allowed list>\", \"us\": \"<value>\", \"us_year\": \"<year>\", \"india\": \"<value>\", \"india_year\": \"<year>\", \"takeaway\": \"<one sentence>\"}]}",
+        "options": {
+          "maxIterations": 5
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        480,
+        48
+      ],
+      "id": "c4af5119-f39e-4466-b7c8-1ab5c607f654",
+      "name": "US vs India agent",
+      "executeOnce": false,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Lecture topics:\n{{ $('Get Topics').first().json.topicList }}\n\nFor the two topics with the clearest modern parallel, find one episode from the 20th or 21st century (1900 to today) where the same economic idea played out in real life. Do not use ancient or medieval examples. Prefer episodes that are well documented.\n\nSteps:\n1. Choose the two topics and one episode for each.\n2. Use the Tavily search tool to find one reliable source about each episode, such as a central bank, a university, an international organization, or an encyclopedia. Search at most 2 times in total, once per episode.\n3. Write the result using only facts that appear in the search results.\n\nRules:\n- Write short, plain search queries (3 to 7 words) that name the episode, such as \"Volcker disinflation unemployment\".\n- Only use sources that appear in the search results. Copy each URL exactly as returned. Never write a URL from memory.\n- If the search finds no good source for an episode, leave that episode out.\n- years: the years the episode covers, for example \"1979 to 1982\".\n- similarity: one sentence on how the episode matches the lecture topic.\n- difference: one sentence on how it differs from the lecture topic or from today's economy.\n- topic: copy the topic title exactly as written in the list above.\n- Do not invent dates, numbers, or quotes.\n- If nothing works, return exactly: {\"history\": []}\n\nReturn only JSON in this shape, with no other text:\n{\"history\": [{\"topic\": \"<topic title>\", \"episode\": \"<name of the episode>\", \"years\": \"<years>\", \"similarity\": \"<one sentence>\", \"difference\": \"<one sentence>\", \"url\": \"<url from the search results>\"}]}",
+        "options": {
+          "maxIterations": 4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        880,
+        48
+      ],
+      "id": "1290849e-1d43-4697-8c6b-bae5989d45e0",
+      "name": "Modern history agent",
+      "executeOnce": false,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const raw = String($('Analyze document1').first().json.content.parts[0].text);\n\nconst topics = [];\nlet current = null;\nfor (const line of raw.split(/\\r?\\n/)) {\n  const text = line.replace(/\\*\\*/g, '').trim();\n  if (!text) continue;\n  let m;\n  if ((m = /^TOPIC:\\s*(.+)$/i.exec(text))) {\n    current = { title: m[1].trim(), bullets: [] };\n    topics.push(current);\n  } else if (current && (m = /^ANALOGY:\\s*(.+)$/i.exec(text))) {\n    current.analogy = m[1].trim();\n  } else if (current && (m = /^[-•*]\\s+(.+)$/.exec(text))) {\n    current.bullets.push(m[1].trim());\n  }\n}\n\nconst kept = topics.filter((t) => t.bullets.length > 0).slice(0, 3);\n\nreturn {\n  json: {\n    topics: kept.map((t) => t.title),\n    topicList: kept.map((t, i) => `${i + 1}. ${t.title}`).join('\\n'),\n    notesJson: kept.length ? JSON.stringify({ topics: kept }) : JSON.stringify(raw),\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        -256
+      ],
+      "id": "f45f3f0f-a841-42bf-b437-dba80250fc93",
+      "name": "Get Topics"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://studybetterecon.netlify.app/api/save-results",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "jobId",
+              "value": "={{ $('Webhook').item.json.body.jobId }}"
+            },
+            {
+              "name": "stage",
+              "value": "error"
+            },
+            {
+              "name": "data",
+              "value": "The AI service is busy or unavailable. Try uploading again in a minute."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -368,
+        16
+      ],
+      "id": "d773cdf7-7884-4b7c-9b9e-5abec8b76fca",
+      "name": "Send error",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "nxd3QVL32GOCUpqo",
+          "name": "Header Auth account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Analyze document1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze document1": {
+      "main": [
+        [
+          {
+            "node": "Get Topics",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Related News agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search the web in Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "Related News agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send notes": {
+      "main": [
+        [
+          {
+            "node": "Related News agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "World Bank Data": {
+      "ai_tool": [
+        [
+          {
+            "node": "US vs India agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "US vs India agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Modern history agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search the web in Tavily1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Modern history agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Context": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Related News agent": {
+      "main": [
+        [
+          {
+            "node": "US vs India agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "US vs India agent": {
+      "main": [
+        [
+          {
+            "node": "Modern history agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modern history agent": {
+      "main": [
+        [
+          {
+            "node": "Combine Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Topics": {
+      "main": [
+        [
+          {
+            "node": "Send notes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "a28d4888-cbcb-4699-af58-bc80f7b14aa7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c17f0a956f581f8989931da326ff16cd66d6f673f7b043ce82b2d56da77f9e9c"
+  },
+  "nodeGroups": [],
+  "id": "zpumkMQaAd8MmCv4",
+  "tags": []
+}
