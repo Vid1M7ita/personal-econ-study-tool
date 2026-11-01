@@ -56,6 +56,22 @@ const clean = (value) =>
     .replace(/^[\s\-*•]+/, "")
     .trim();
 
+/** Shorten long text for a one-line label. */
+const short = (value, max = 90) => {
+  const text = clean(value);
+  return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
+};
+
+/** Search results give dates like "Tue, 19 May 2026 00:00:00 GMT". Show "May 19, 2026". Unknown text is left alone. */
+function niceDate(value) {
+  const text = clean(value);
+  if (!text || text === "unknown") return "";
+  const date = new Date(text);
+  return Number.isNaN(date.getTime())
+    ? text
+    : date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" });
+}
+
 const toArray = (value) => (Array.isArray(value) ? value : value == null || value === "" ? [] : [value]);
 const isObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
 
@@ -312,7 +328,7 @@ function renderArticles(list) {
           "li",
           {},
           linkTitle(a.title, a.url),
-          meta(url ? url.hostname.replace(/^www\./, "") : "", a.published && a.published !== "unknown" ? a.published : "", a.topic ? `Topic: ${clean(a.topic)}` : ""),
+          meta(url ? url.hostname.replace(/^www\./, "") : "", niceDate(a.published), a.topic ? `Topic: ${short(a.topic)}` : ""),
           a.why_it_fits ? el("p", { class: "item__body" }, clean(a.why_it_fits)) : null,
           unverifiedFlag(a),
         );
@@ -358,7 +374,7 @@ function renderHistory(list) {
           "li",
           {},
           linkTitle(h.episode || h.title, h.url || h.source_url),
-          meta(h.years, h.topic ? `Topic: ${clean(h.topic)}` : ""),
+          meta(h.years, h.topic ? `Topic: ${short(h.topic)}` : ""),
           h.similarity ? el("p", { class: "item__body" }, el("strong", {}, "Alike: "), clean(h.similarity)) : null,
           h.difference ? el("p", { class: "item__body" }, el("strong", {}, "Different: "), clean(h.difference)) : null,
           unverifiedFlag(h),
