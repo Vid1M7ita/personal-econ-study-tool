@@ -337,25 +337,50 @@ function renderArticles(list) {
   ];
 }
 
+/** Built here, not by the AI, so the link can never be made up. Only plain indicator codes are accepted. */
+function worldBankUrl(code) {
+  return /^[A-Z0-9.]{3,40}$/.test(String(code ?? "")) ? `https://data.worldbank.org/indicator/${code}?locations=US-IN` : null;
+}
+
+/** The two countries often report different years, so every value carries its own. */
+function withYear(value, year) {
+  const v = clean(value);
+  const y = clean(year);
+  return v ? (y ? `${v} (${y})` : v) : "No data";
+}
+
 function renderComparison(list) {
   const rows = toArray(list).filter(isObject);
   if (!rows.length) return null;
   const body = el("tbody");
   for (const r of rows) {
+    const href = worldBankUrl(r.code);
+    const label = clean(r.indicator) || clean(r.code) || "Measure";
     body.append(
-      el("tr", {}, el("th", { scope: "row" }, clean(r.indicator)), el("td", {}, clean(r.us)), el("td", {}, clean(r.india)), el("td", {}, clean(r.year))),
+      el(
+        "tr",
+        {},
+        el(
+          "th",
+          { scope: "row" },
+          href ? el("a", { href, target: "_blank", rel: "noopener noreferrer" }, label) : label,
+          r.topic ? el("span", { class: "cell__sub" }, `Topic: ${short(r.topic)}`) : null,
+        ),
+        el("td", {}, withYear(r.us, r.us_year ?? r.year)),
+        el("td", {}, withYear(r.india, r.india_year ?? r.year)),
+      ),
     );
     if (r.takeaway || r.verified === false) {
       body.append(
-        el("tr", { class: "takeaway" }, el("td", { colspan: "4" }, clean(r.takeaway), r.verified === false ? " Could not be verified." : "")),
+        el("tr", { class: "takeaway" }, el("td", { colspan: "3" }, clean(r.takeaway), r.verified === false ? " Could not be verified." : "")),
       );
     }
   }
   const table = el(
     "table",
     {},
-    el("caption", { class: "item__meta" }, "Figures are from public data. Check the source for the year and definition."),
-    el("thead", {}, el("tr", {}, el("th", { scope: "col" }, "Measure"), el("th", { scope: "col" }, "United States"), el("th", { scope: "col" }, "India"), el("th", { scope: "col" }, "Year"))),
+    el("caption", { class: "item__meta" }, "Figures are from the World Bank. Each value shows its own year. Open a measure to see the source."),
+    el("thead", {}, el("tr", {}, el("th", { scope: "col" }, "Measure"), el("th", { scope: "col" }, "United States"), el("th", { scope: "col" }, "India"))),
     body,
   );
   return [el("h3", {}, "United States and India"), el("div", { class: "table-wrap" }, table)];

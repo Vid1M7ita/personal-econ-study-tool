@@ -73,7 +73,7 @@ Every key is optional. The page shows only what is present.
     { "topic": "...", "title": "...", "url": "https://...", "published": "2026-07-08", "why_it_fits": "One sentence." }
   ],
   "comparison": [
-    { "indicator": "Unemployment rate (% of labor force)", "us": "3.6", "india": "4.2", "year": "2023", "takeaway": "One sentence." }
+    { "topic": "...", "code": "FP.CPI.TOTL.ZG", "indicator": "Inflation, consumer prices (annual %)", "us": "2.9", "us_year": "2024", "india": "2.4", "india_year": "2025", "takeaway": "One sentence." }
   ],
   "history": [
     { "episode": "The Volcker disinflation", "years": "1979 to 1982", "topic": "...", "similarity": "...", "difference": "...", "url": "https://..." }
@@ -84,6 +84,8 @@ Every key is optional. The page shows only what is present.
 
 Set `"verified": false` on any item the verifier agent could not confirm. The page
 labels it "Could not be verified".
+
+The two countries often report different years, so give each value its own year. The page builds the World Bank link from `code`, so never write a URL for the comparison.
 
 Links must start with `https://` or `http://`. Anything else is shown as plain text.
 

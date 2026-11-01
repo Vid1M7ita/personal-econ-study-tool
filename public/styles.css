@@ -243,6 +243,9 @@ table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
 caption { padding-bottom: 0.5rem; text-align: left; }
 th, td { padding: 0.5rem 0.6rem 0.5rem 0; border-top: 1px solid var(--rule); text-align: left; vertical-align: top; }
 thead th { border-top: 0; border-bottom: 2px solid var(--ink-soft); }
+th a { color: var(--pen); text-underline-offset: 0.15em; }
+th a:focus-visible { outline: 3px solid var(--pen); outline-offset: 2px; }
+.cell__sub { display: block; margin-top: 0.1rem; color: var(--ink-soft); font-size: 0.85rem; font-weight: 400; }
 tbody tr.takeaway td { padding-top: 0; border-top: 0; color: var(--ink-soft); font-family: var(--serif); }
 
 .raw {
