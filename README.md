@@ -4,11 +4,11 @@ Upload an economics lecture PDF. Get study notes for up to three topics, then re
 
 Built for the AI Club Applied AI Development Program capstone (CU Boulder).
 
-**Live site:** [add your live URL here]
+**Live site:** studybetterecon.netlify.app
 
 ## Who it is for
 
-Students in an intermediate economics course who want lecture slides turned into short notes, plus real examples that show the ideas at work. The tool is economics only, and the comparison covers the United States and India only. Narrow scope keeps the results accurate.
+Students in an economics course who want dense lectures turned into short notes, plus real world context that show the ideas at work. The tool is economics only, and the comparison covers the United States and India only. Narrow scope keeps the results accurate.
 
 ## What it does
 
@@ -96,4 +96,26 @@ n8n/               the exported workflow
 
 ## How this was built
 
-Vivi built, ran and tested the n8n workflow step by step. Claude (Anthropic) was used as a coding assistant: it wrote the Netlify site and functions and drafted the agent prompts, and Vivi tested each part. The site was also checked in a browser and with automated tests.
+I started with a narrow idea (economics lectures only), defined the user and the problem, and built it in layers, testing each layer before adding the next.
+
+1. **Design.** The site lives on Netlify and handles upload, status and display. The AI work runs in an n8n workflow. A job ID links the two, and the page checks for results every few seconds, so the notes can appear first and the real-world context a few minutes later.
+2. **Backend first.** The three Netlify functions (upload, save-results, status) came first, with 14 automated tests.
+3. **The workflow, one stage at a time.** I built the n8n pipeline stage by stage and tested each with real lecture PDFs: webhook, Gemini writes the notes, a code step splits them into topics, the three agents, a merge step, and delivery to the site.
+4. **Hardening.** Two separate secrets protect the two directions. Uploads get a PDF check, a 4 MB cap and a rate limit. AI output is shown as plain text under a strict content security policy. Results expire after 24 hours. Gemini calls retry, and a failure takes an error path instead of a blank page.
+5. **Interface.** The SBE logo, a dark theme by default with a light option, and a wide layout that uses the whole window. Text contrast was checked in both themes, and the page was tested in a browser at five screen sizes.
+6. **Shipping.** GitHub to Netlify. I scanned the exported workflow for secrets before committing it.
+
+### Problems I hit and what I changed
+
+- **Malformed JSON.** Gemini could not reliably write long notes as JSON, so it now writes plain lines and code builds the JSON.
+- **Gemini overload (503 errors).** The notes step now tries up to four times, then sends a plain error message to the page.
+- **Different data years.** The US and India can report different years for the same measure, so each value shows its own year. The page builds the World Bank link, so the AI cannot invent one.
+- **A private Netlify site blocked n8n.** The site is public, and the secret header protects the endpoint.
+- **A merge step assumed the agents returned text.** They return structured data, so it now handles both.
+- **Saved test data can hold secrets.** I only exported the workflow after clearing it and scanning the file.
+
+### Who did what
+
+I came up with the idea, chose the scope and requirements, built, ran and tested the n8n workflow, set up the secrets and deployment, and tested everything on real lectures. I used Claude (Anthropic) as a coding assistant. It wrote the Netlify site and functions, drafted the agent prompts and code steps, and helped with debugging and the visual design. I chose the colors, the name and the logo concept, and I tested each part before moving on.
+
+It has been tested on a small number of real lectures, not at scale.
